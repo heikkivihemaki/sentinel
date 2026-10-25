@@ -12,12 +12,13 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.ProducerFactory;
-import org.springframework.kafka.config.KafkaStreamsConfiguration;
+import org.springframework.kafka.annotation.EnableKafkaStreams;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
+@EnableKafkaStreams
 public class KafkaConfig {
     @Bean
     ProducerFactory<String, TelemetryEvent> telemetryProducerFactory(KafkaProperties properties) {

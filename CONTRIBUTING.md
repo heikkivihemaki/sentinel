@@ -8,7 +8,7 @@ Thanks for your interest in contributing! This guide gets you from zero to an op
 
 - Java 21
 - Maven 3.9+
-- Docker Desktop (required for Testcontainers — tests spin up real PostgreSQL and Kafka)
+- Docker and Docker Compose (required for running the infrastructure locally)
 
 ### Fork and clone
 
@@ -20,22 +20,43 @@ cd sentinel
 
 ### Start infrastructure
 
+Start the infrastructure services without the Sentinel container:
+
 ```bash
-docker compose up -d   # Kafka, PostgreSQL, Redis, Prometheus, Grafana
+docker compose up -d kafka postgres redis prometheus grafana
+```
+
+If the Sentinel container is already running, stop it before running
+the application locally:
+
+```bash
+docker compose stop sentinel
 ```
 
 ### Run the app
 
 ```bash
-./mvnw spring-boot:run
+mvn spring-boot:run
 ```
 
-Then hit `http://localhost:8080/actuator/health` to verify everything is connected.
+The local application connects to Kafka at `localhost:9092`.
+The Sentinel container uses `kafka:9092` through a separate listener.
+
+Check the application health:
+
+```bash
+curl -i http://localhost:8080/actuator/health
+```
+
+An HTTP 200 response with `"status":"UP"` confirms the health endpoint
+is reporting healthy. It does not by itself verify event processing.
+
+For running everything in Docker, see [BUILDING.md](BUILDING.md).
 
 ### Run the tests
 
 ```bash
-./mvnw test
+mvn test
 ```
 
 Tests use Testcontainers so they spin up a real PostgreSQL instance — all tests must pass before you open a PR.

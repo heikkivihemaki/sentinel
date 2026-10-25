@@ -131,14 +131,44 @@ The detector is intentionally simple and easy to reason about. The [roadmap](doc
 - Java 21
 - Maven 3.9+
 
-### 1. Start everything
+### 1. Start Sentinel
 
 ```bash
 git clone https://github.com/taniyanandi/sentinel.git
 cd sentinel
-docker compose up -d          # Kafka, PostgreSQL, Redis, Prometheus, Grafana
-./mvnw spring-boot:run        # start Sentinel
 ```
+
+Choose one of the following run modes.
+
+#### Run everything in Docker
+
+Build the application JAR before building the Docker image:
+
+```bash
+mvn clean verify
+docker compose up -d --build
+```
+
+#### Run Sentinel locally
+
+If the Sentinel container is already running, stop it before starting
+the local application:
+
+```bash
+docker compose stop sentinel
+```
+
+Start the infrastructure services without the Sentinel container:
+
+```bash
+docker compose up -d kafka postgres redis prometheus grafana
+mvn spring-boot:run
+```
+
+Kafka advertises `kafka:9092` to Docker clients and `localhost:9092`
+to local clients through separate listeners.
+
+Both run modes use port 8080 for Sentinel, so run only one at a time.
 
 ### 2. Ingest an event
 
@@ -187,7 +217,7 @@ k6 run loadtest/sentinel.js   # 100 events/sec for 60s
 ### Run tests
 
 ```bash
-./mvnw test   # requires Docker for Testcontainers
+mvn test   # requires Docker for Testcontainers
 ```
 
 More build details are in [BUILDING.md](BUILDING.md).

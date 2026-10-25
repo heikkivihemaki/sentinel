@@ -2,22 +2,37 @@
 
 ## Local build
 
-```bash
-./mvnw clean verify
-```
-
-If the Maven wrapper is not present in your environment, use Maven 3.9+:
+Requires Java 21, Maven 3.9+. Docker and Docker Compose are required to run the infrastructure.
 
 ```bash
 mvn clean verify
 ```
 
-## Docker
+## Run everything in Docker
+
+The Dockerfile copies the application JAR from `target`, so build it first:
 
 ```bash
-docker compose up -d
+mvn clean verify
+docker compose up -d --build
+```
+
+## Run Sentinel locally with Docker infrastructure
+
+If the Sentinel container is already running, stop it first:
+
+```bash
+docker compose stop sentinel
+```
+
+```bash
+docker compose up -d kafka postgres redis prometheus grafana
 mvn spring-boot:run
 ```
+
+Kafka uses `kafka:9092` for Docker clients and `localhost:9092`
+for local clients. Run only one Sentinel instance at a time
+to avoid a port 8080 conflict.
 
 ## What to capture for a portfolio demo
 
